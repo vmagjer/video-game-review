@@ -19,7 +19,7 @@ export default defineConfig({
         '@vueuse/head',
         'pinia',
         {
-          '@/store': ['useStore'],
+          '@/stores/store': ['useStore'],
         },
       ],
       dts: true,
