@@ -14,6 +14,7 @@ export const useGameStore = defineStore('game', () => {
   const totalPages = computed(() => Math.max(1, Math.ceil(totalGames.value / ITEMS_PER_PAGE)))
 
   async function fetchGames({ searchParams }: { searchParams: SearchParams }) {
+    page.value = 1
     const response = await api.game.list(page.value, ITEMS_PER_PAGE, { query: searchParams.query, genres: searchParams.genres?.map(Number) })
     games.value = response.data
     totalGames.value = response.total

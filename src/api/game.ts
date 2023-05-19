@@ -1,4 +1,3 @@
-import { type } from "os"
 import { mockGenres, type Genre } from "./genre"
 import type { PaginatedList } from "./types"
 
@@ -6,6 +5,7 @@ export type Game = {
   id: number
   name: string
   image: string
+  rating?: number
   genres: Genre[]
   createdAt: string
   updatedAt: string
@@ -16,12 +16,21 @@ export type Game = {
 const mockGames: Game[] = [
   {
     id: 1,
-    name: 'Game 1',
+    name: 'Lord of the very long name that is very long and has a very long name 1',
     image: 'http://unsplash.it/300/400?random&gravity=center',
+    rating: 4,
     genres: [
       {
         id: 1,
         name: 'Genre 1',
+      },
+      {
+        id: 2,
+        name: 'Genre 2',
+      },
+      {
+        id: 2,
+        name: 'Genre 2',
       },
       {
         id: 2,
@@ -35,6 +44,7 @@ const mockGames: Game[] = [
     id: 2,
     name: 'Game 2',
     image: 'http://unsplash.it/300/400?random&gravity=center',
+    rating: 3,
     createdAt: '2021-01-01T00:00:00.000Z',
     updatedAt: '2021-01-01T00:00:00.000Z',
     genres: [

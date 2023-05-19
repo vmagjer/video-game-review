@@ -18,7 +18,7 @@ function previousPage() {
 
 <template>
   <div class="">
-    <div class="">
+    <div class="bg-neutral-100">
       <slot></slot>
     </div>
     <div class="flex justify-end mt-4 gap-1 p-2">
@@ -28,14 +28,14 @@ function previousPage() {
         Page {{ page }} of {{ totalPages }}
       </div>
       <button
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
         :disabled="props.page === 1"
         @click="previousPage"
       >
         Previous
       </button>
       <button
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
         :disabled="page === totalPages"
         @click="nextPage"
       >
