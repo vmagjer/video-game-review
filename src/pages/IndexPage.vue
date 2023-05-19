@@ -21,37 +21,68 @@ useHead({
   ],
 })
 
+const loading = ref(false)
 onMounted(async () => {
+  loading.value = true
   await gameStore.fetchGames({
     searchParams: { query: query.value, genres: genres.value },
   })
+  loading.value = false
 })
 
 const genres = ref<string[]>([])
 async function handleGenreChange(genreIds: string[]) {
-  genres.value = genreIds
-  await gameStore.fetchGames({
-    searchParams: { query: query.value, genres: genreIds },
-  })
+  loading.value = true
+  try {
+    genres.value = genreIds
+    await gameStore.fetchGames({
+      searchParams: { query: query.value, genres: genreIds },
+    })
+  } catch (error) {
+    alert(error)
+  } finally {
+    loading.value = false
+  }
 }
 
 const query = ref('')
 watch(query, async (newVal) => {
-  await gameStore.fetchGames({
-    searchParams: { query: newVal, genres: genres.value },
-  })
+  loading.value = true
+  try {
+    await gameStore.fetchGames({
+      searchParams: { query: newVal, genres: genres.value },
+    })
+  } catch (error) {
+    alert(error)
+  } finally {
+    loading.value = false
+  }
 })
 
 const gameStore = useGameStore()
 async function nextPage() {
-  await gameStore.nextPage({
-    searchParams: { query: query.value, genres: genres.value },
-  })
+  loading.value = true
+  try {
+    await gameStore.nextPage({
+      searchParams: { query: query.value, genres: genres.value },
+    })
+  } catch (error) {
+    alert(error)
+  } finally {
+    loading.value = false
+  }
 }
 async function previousPage() {
-  await gameStore.previousPage({
-    searchParams: { query: query.value, genres: genres.value },
-  })
+  loading.value = true
+  try {
+    await gameStore.previousPage({
+      searchParams: { query: query.value, genres: genres.value },
+    })
+  } catch (error) {
+    alert(error)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -62,8 +93,8 @@ async function previousPage() {
     ></div>
     <div class="min-h-screen">
       <div class="h-10 grid grid-cols-12 gap-6 mb-12">
-        <div class="col-span-3"></div>
-        <div class="col-span-6">
+        <div class="col-span-4"></div>
+        <div class="col-span-5">
           <div
             class="container px-4 h-full relative bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
           >
@@ -84,7 +115,7 @@ async function previousPage() {
             />
           </div>
         </div>
-        <div class="col-span-4 space-y-4">
+        <div class="col-span-5 space-y-4">
           <div
             class="container relative bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
           >
@@ -96,9 +127,9 @@ async function previousPage() {
             />
           </div>
           <div
-            class="container relative max-w-2xl mx-auto bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
+            class="container relative mx-auto bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
           >
-            <h2 class="px-4 pt-2 pb-2 text-sm text-neutral-500">Results</h2>
+            <h2 class="px-4 pt-2 pb-2 text-sm text-neutral-500">Results <span v-show="loading">Loading...</span></h2>
             <main>
               <PaginatedContainer
                 :page="gameStore.page"
@@ -144,7 +175,7 @@ async function previousPage() {
       <div class="col-span-4" />
       <div class="col-span-4">
         <div
-          class="container relative max-w-2xl mx-auto bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
+          class="container relative mx-auto bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
         >
           <footer class="py-6 text-sm text-center text-gray-700">
             Built by Nikola Dokic & Vlatko Magjer with ❤️
