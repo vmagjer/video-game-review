@@ -21,7 +21,7 @@ function previousPage() {
     <div class="bg-neutral-100">
       <slot></slot>
     </div>
-    <div class="flex justify-end mt-4 gap-1 p-2">
+    <div class="flex justify-end mt-4 gap-1 px-4 py-2">
       <div
         class="flex items-center text-sm text-gray-700 dark:text-gray-300 mr-2"
       >
