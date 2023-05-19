@@ -6,48 +6,48 @@ const ITEMS_PER_PAGE = 10
 
 export const useReviewStore = defineStore('review', () => {
   // MASTER
-  const _reviews = ref<Review[]>([])
-  const _page = ref<number>(1)
-  const _totalReviews = ref<number>(0)
-  const _maxPage = computed(() => Math.ceil(_totalReviews.value / ITEMS_PER_PAGE))
+  const reviews = ref<Review[]>([])
+  const page = ref<number>(1)
+  const totalReviews = ref<number>(0)
+  const totalPages = computed(() => Math.ceil(totalReviews.value / ITEMS_PER_PAGE))
 
-  async function fetchReviews({ gameId }: { gameId: number }) {
-    const response = await api.review.list(gameId, _page.value, ITEMS_PER_PAGE)
-    _reviews.value = response.data
-    _totalReviews.value = response.total
+  async function fetchReviews({ gameId }: { gameId: string }) {
+    const response = await api.review.list(parseInt(gameId), page.value, ITEMS_PER_PAGE)
+    reviews.value = response.data
+    totalReviews.value = response.total
   }
-  async function nextPage({ gameId }: { gameId: number }) {
-    if (_page.value >= _maxPage.value) throw new Error('Page does not exist')
-    _page.value++
+  async function nextPage({ gameId }: { gameId: string }) {
+    if (page.value >= totalPages.value) throw new Error('Page does not exist')
+    page.value++
     await fetchReviews({ gameId })
   }
-  async function previousPage({ gameId }: { gameId: number }) {
-    if (_page.value <= 1) throw new Error('Page does not exist')
-    _page.value--
+  async function previousPage({ gameId }: { gameId: string }) {
+    if (page.value <= 1) throw new Error('Page does not exist')
+    page.value--
     await fetchReviews({ gameId })
   }
 
   // DETAIL
-  const _review = ref<Review | null>(null)
-  async function fetchReview(reviewId: number) {
-    _review.value = await api.review.get(reviewId)
+  const review = ref<Review | null>(null)
+  async function fetchReview(reviewId: string) {
+    review.value = await api.review.get(parseInt(reviewId))
   }
-  async function updateReview({ reviewId, review }: { reviewId: number, review: Partial<Review> }) {
-    _review.value = await api.review.update(reviewId, review)
+  async function updateReview({ reviewId, changedReview }: { reviewId: number, changedReview: Partial<Review> }) {
+    review.value = await api.review.update(reviewId, changedReview)
   }
-  async function createReview(review: Review) {
-    await api.review.create(review)
+  async function createReview(newReview: Review) {
+    await api.review.create(newReview)
   }
 
   return {
-    review: computed(() => _review.value),
+    review,
     fetchReview,
     updateReview,
     createReview,
-    reviews: computed(() => _reviews.value),
-    page: computed(() => _page.value),
-    totalReviews: computed(() => _totalReviews.value),
-    maxPage: computed(() => _maxPage.value),
+    reviews,
+    page,
+    totalReviews,
+    totalPages,
     fetchReviews,
     nextPage,
     previousPage,

@@ -32,8 +32,8 @@ export const useGameStore = defineStore('game', () => {
 
   // DETAIL
   const game = ref<Game | null>(null)
-  async function fetchGame(gameId: number) {
-    game.value = await api.game.find(gameId)
+  async function fetchGame(gameId: string) {
+    game.value = await api.game.find(parseInt(gameId))
   }
   async function updateGame({ gameId, changedGame }: { gameId: number, changedGame: Partial<Game> }) {
     game.value = await api.game.update(gameId, changedGame)
