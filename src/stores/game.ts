@@ -4,54 +4,54 @@ import { defineStore } from 'pinia'
 
 const ITEMS_PER_PAGE = 10
 
-type SearchParams = Partial<{ query: string, genres: number[] }>
+type SearchParams = Partial<{ query: string, genres: string[] }>
 
 export const useGameStore = defineStore('game', () => {
   // MASTER
-  const _games = ref<Game[]>([])
-  const _page = ref<number>(1)
-  const _totalGames = ref<number>(0)
-  const _maxPage = computed(() => Math.ceil(_totalGames.value / ITEMS_PER_PAGE))
+  const games = ref<Game[]>([])
+  const page = ref<number>(1)
+  const totalGames = ref<number>(0)
+  const totalPages = computed(() => Math.max(1, Math.ceil(totalGames.value / ITEMS_PER_PAGE)))
 
-  async function fetchGames({ searchParams }: { searchParams: SearchParams}) {
-    const response = await api.game.list(_page.value, ITEMS_PER_PAGE, { query: searchParams.query, genres: searchParams.genres })
-    _games.value = response.data
-    _totalGames.value = response.total
+  async function fetchGames({ searchParams }: { searchParams: SearchParams }) {
+    const response = await api.game.list(page.value, ITEMS_PER_PAGE, { query: searchParams.query, genres: searchParams.genres?.map(Number) })
+    games.value = response.data
+    totalGames.value = response.total
   }
-  async function nextPage({searchParams}: { searchParams: SearchParams}) {
-    if (_page.value >= _maxPage.value) throw new Error('No more pages')
-    _page.value++
+  async function nextPage({ searchParams }: { searchParams: SearchParams }) {
+    if (page.value >= totalPages.value) throw new Error('No more pages')
+    page.value++
     await fetchGames({ searchParams })
   }
-  async function previousPage({searchParams}: { searchParams: SearchParams}) {
-    if (_page.value <= 1) throw new Error('No more pages')
-    _page.value--
+  async function previousPage({ searchParams }: { searchParams: SearchParams }) {
+    if (page.value <= 1) throw new Error('No more pages')
+    page.value--
     await fetchGames({ searchParams })
   }
 
   // DETAIL
-  const _game = ref<Game | null>(null)
+  const game = ref<Game | null>(null)
   async function fetchGame(gameId: number) {
-    _game.value = await api.game.find(gameId)    
+    game.value = await api.game.find(gameId)
   }
-  async function updateGame({ gameId, game }: { gameId: number, game: Partial<Game> }) {
-    _game.value = await api.game.update(gameId, game)
+  async function updateGame({ gameId, changedGame }: { gameId: number, changedGame: Partial<Game> }) {
+    game.value = await api.game.update(gameId, changedGame)
   }
-  async function createGame(game: Game) {
-    await api.game.create(game)
+  async function createGame(newGame: Game) {
+    await api.game.create(newGame)
   }
 
   return {
-    game: computed(() => _game.value),
-    fetchGame,
-    updateGame,
-    createGame,
-    games: computed(() => _games.value),
-    page: computed(() => _page.value),
-    totalGames: computed(() => _totalGames.value),
-    maxPage: computed(() => _maxPage.value),
+    games,
+    page,
+    totalGames,
+    totalPages,
     fetchGames,
     nextPage,
     previousPage,
+    game,
+    fetchGame,
+    updateGame,
+    createGame,
   }
 })
