@@ -70,15 +70,19 @@ export async function list(gameId: number, page: number, perPage: number): Promi
   }
 }
 
-
-export async function create(review: Review): Promise<Review> {
+export type NewReview = Omit<Review, 'id' | 'createdAt' | 'updatedAt'>
+export async function create(review: NewReview): Promise<Review> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
-  mockReviews.push(review)
-  return review
+  return {
+    ...review,
+    id: Math.max(...mockReviews.map(review => review.id)) + 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
 }
 
-export async function update(reviewId: number, review: Partial<Review>): Promise<Review> {
+export async function update(reviewId: number, review: Partial<NewReview>): Promise<Review> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
   const mReview = mockReviews.find(mReview => mReview.id === reviewId)!

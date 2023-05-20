@@ -1,5 +1,5 @@
 import api from '@/api';
-import type { Review } from '@/api/review';
+import type { NewReview, Review } from '@/api/review';
 import { defineStore } from 'pinia'
 
 const ITEMS_PER_PAGE = 10
@@ -32,10 +32,10 @@ export const useReviewStore = defineStore('review', () => {
   async function fetchReview(reviewId: string) {
     review.value = await api.review.get(parseInt(reviewId))
   }
-  async function updateReview({ reviewId, changedReview }: { reviewId: number, changedReview: Partial<Review> }) {
+  async function updateReview({ reviewId, changedReview }: { reviewId: number, changedReview: Partial<NewReview> }) {
     review.value = await api.review.update(reviewId, changedReview)
   }
-  async function createReview(newReview: Review) {
+  async function createReview(newReview: NewReview) {
     await api.review.create(newReview)
   }
 

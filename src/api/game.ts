@@ -4,11 +4,11 @@ import type { PaginatedList } from "./types"
 export type Game = {
   id: number
   name: string
-  image: string
-  rating: number
-  numReviews: number
+  image?: string
   description: string
   genres: Genre[]
+  rating: number
+  numReviews: number
   createdAt: string
   updatedAt: string
 }
@@ -93,7 +93,8 @@ export async function find(id: number): Promise<Game> {
   return mockGames.find(mGame => mGame.id === id)!
 }
 
-export async function create(game: Game): Promise<Game> {
+export type NewGame = Omit<Game, 'id' | 'createdAt' | 'updatedAt' | 'numReviews' | 'rating' >
+export async function create(game: NewGame): Promise<Game> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
   if (game.genres.length) {
@@ -104,9 +105,17 @@ export async function create(game: Game): Promise<Game> {
     })
   }
 
-  mockGames.push(game)
+  mockGames.push({
+    ...game,
+    image: game.image || 'http://unsplash.it/250/100?random&gravity=center',
+    id: mockGames.length + 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    numReviews: 0,
+    rating: 5,
+  })
 
-  return game
+  return mockGames[mockGames.length - 1]
 }
 
 export async function update(gameId: number, game: Partial<Game>): Promise<Game> {

@@ -1,5 +1,5 @@
 import api from '@/api';
-import type { Game } from '@/api/game';
+import type { Game, NewGame } from '@/api/game';
 import { defineStore } from 'pinia'
 
 const ITEMS_PER_PAGE = 10
@@ -38,8 +38,8 @@ export const useGameStore = defineStore('game', () => {
   async function updateGame({ gameId, changedGame }: { gameId: number, changedGame: Partial<Game> }) {
     game.value = await api.game.update(gameId, changedGame)
   }
-  async function createGame(newGame: Game) {
-    await api.game.create(newGame)
+  async function createGame(newGame: NewGame) {
+    return await api.game.create(newGame)
   }
 
   return {
