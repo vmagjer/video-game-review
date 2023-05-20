@@ -1,100 +1,90 @@
-import type { PaginatedList } from "./types"
-
+type User = {
+  id: number
+  username: string
+  firstName: string
+  email: string
+}
 export type Review = {
   id: number
-  title: string
-  body: string
+  review: string
   rating: number
   gameId: number
-  userId: number
-  userName: string
-  createdAt: string
-  updatedAt: string
+  user: User
 }
 
 const mockReviews: Review[] = [
   {
     id: 1,
-    title: 'Lorem ipsum dolor sit amet, consectetur',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
+    review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
     rating: 5,
     gameId: 1,
-    userId: 1,
-    userName: 'Nikola Tesla',
-    createdAt: '2021-01-01T00:00:00.000Z',
-    updatedAt: '2021-01-01T00:00:00.000Z',
+    user: {
+      id: 1,
+      username: 'Nikola Tesla',
+      firstName: 'Nikola',
+      email: 'nikola.tesla@email.com',
+    },
   },
   {
     id: 3,
-    title: 'Review 1',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
+    review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
     rating: 1,
     gameId: 1,
-    userId: 2,
-    userName: 'Franc Kafka',
-    createdAt: '2021-01-01T00:00:00.000Z',
-    updatedAt: '2021-01-01T00:00:00.000Z',
+    user: {
+      id: 2,
+      username: 'John Doe',
+      firstName: 'John',
+      email: 'j.d.@email.com',
+    },
   },
   {
     id: 4,
-    title: 'Review 1',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
+    review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
     rating: 7,
     gameId: 1,
-    userId: 3,
-    userName: 'Pero Peric',
-    createdAt: '2021-01-01T00:00:00.000Z',
-    updatedAt: '2021-01-01T00:00:00.000Z',
+    user: {
+      id: 3,
+      username: 'Jane Doe',
+      firstName: 'Jane',
+      email: 'j.d.@email.com',
+    },
   },
   {
     id: 2,
-    title: 'Review 2',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
+    review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
     rating: 4,
     gameId: 2,
-    userId: 1,
-    userName: 'Nikola Tesla',
-    createdAt: '2021-01-01T00:00:00.000Z',
-    updatedAt: '2021-01-01T00:00:00.000Z',
+    user: {
+      id: 1,
+      username: 'Nikola Tesla',
+      firstName: 'Nikola',
+      email: 'nikola.tesla@email.com',
+    },
   },
 ]
 
-export async function list(gameId: number, page: number, perPage: number): Promise<PaginatedList<Review>> {
+export async function list(gameId: number): Promise<Review[]> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
-  return {
-    data: mockReviews.filter(review => review.gameId === gameId).slice((page - 1) * perPage, page * perPage),
-    total: mockReviews.filter(review => review.gameId === gameId).length,
-    next: null,
-    previous: null,
-  }
+  return mockReviews.filter(review => review.gameId === gameId)
 }
 
-export type NewReview = Omit<Review, 'id' | 'createdAt' | 'updatedAt'>
+export type NewReview = Review
 export async function create(review: NewReview): Promise<Review> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
   return {
     ...review,
     id: Math.max(...mockReviews.map(review => review.id)) + 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
   }
 }
 
-export async function update(reviewId: number, review: Partial<NewReview>): Promise<Review> {
+export async function update(review: Review): Promise<Review> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
-  const mReview = mockReviews.find(mReview => mReview.id === reviewId)!
-  Object.assign(mReview, review)
-  return mReview
-}
-
-export async function remove(reviewId: number): Promise<void> {
-  // delay(500)
-  await new Promise(resolve => setTimeout(resolve, 500))
-  const index = mockReviews.findIndex(mReview => mReview.id === reviewId)
-  mockReviews.splice(index, 1)
+  const index = mockReviews.findIndex(mReview => mReview.id === review.id)
+  mockReviews[index] = review
+  return review  
 }
 
 export async function get(reviewId: number): Promise<Review> {
@@ -103,3 +93,9 @@ export async function get(reviewId: number): Promise<Review> {
   return mockReviews.find(mReview => mReview.id === reviewId)!
 }
 
+export async function remove(reviewId: number): Promise<void> {
+  // delay(500)
+  await new Promise(resolve => setTimeout(resolve, 500))
+  const index = mockReviews.findIndex(mReview => mReview.id === reviewId)
+  mockReviews.splice(index, 1)
+}

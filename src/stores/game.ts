@@ -2,41 +2,30 @@ import api from '@/api';
 import type { Game, NewGame } from '@/api/game';
 import { defineStore } from 'pinia'
 
-const ITEMS_PER_PAGE = 10
-
-type SearchParams = Partial<{ query: string, genres: string[] }>
-
 export const useGameStore = defineStore('game', () => {
-  // MASTER
+  // LIST
   const games = ref<Game[]>([])
-  const page = ref<number>(1)
-  const totalGames = ref<number>(0)
-  const totalPages = computed(() => Math.max(1, Math.ceil(totalGames.value / ITEMS_PER_PAGE)))
 
-  async function fetchGames({ searchParams }: { searchParams: SearchParams }) {
-    page.value = 1
-    const response = await api.game.list(page.value, ITEMS_PER_PAGE, { query: searchParams.query, genres: searchParams.genres?.map(Number) })
-    games.value = response.data
-    totalGames.value = response.total
+  async function fetchGames() {
+    const response = await api.game.list()
+    games.value = response
   }
-  async function nextPage({ searchParams }: { searchParams: SearchParams }) {
-    if (page.value >= totalPages.value) throw new Error('No more pages')
-    page.value++
-    await fetchGames({ searchParams })
+  async function fetchByGenre(genreId: number) {
+    const response = await api.game.listByGenre(genreId)
+    games.value = response
   }
-  async function previousPage({ searchParams }: { searchParams: SearchParams }) {
-    if (page.value <= 1) throw new Error('No more pages')
-    page.value--
-    await fetchGames({ searchParams })
+  async function fetchByPlatform(platformId: number) {
+    const response = await api.game.listByPlatform(platformId)
+    games.value = response
   }
 
-  // DETAIL
+  // SINGLE
   const game = ref<Game | null>(null)
-  async function fetchGame(gameId: string) {
-    game.value = await api.game.find(parseInt(gameId))
+  async function fetchGame(gameId: number) {
+    game.value = await api.game.find(gameId)
   }
-  async function updateGame({ gameId, changedGame }: { gameId: number, changedGame: Partial<Game> }) {
-    game.value = await api.game.update(gameId, changedGame)
+  async function updateGame({ changedGame }: { changedGame: Game }) {
+    game.value = await api.game.update(changedGame)
   }
   async function createGame(newGame: NewGame) {
     return await api.game.create(newGame)
@@ -44,12 +33,9 @@ export const useGameStore = defineStore('game', () => {
 
   return {
     games,
-    page,
-    totalGames,
-    totalPages,
     fetchGames,
-    nextPage,
-    previousPage,
+    fetchByGenre,
+    fetchByPlatform,
     game,
     fetchGame,
     updateGame,
