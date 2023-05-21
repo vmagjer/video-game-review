@@ -1,5 +1,5 @@
 import api from '@/api';
-import type { NewReview, Review } from '@/api/review';
+import type { Review } from '@/api/review';
 import { defineStore } from 'pinia'
 
 export const useReviewStore = defineStore('review', () => {
@@ -16,11 +16,23 @@ export const useReviewStore = defineStore('review', () => {
   async function fetchReview(reviewId: number) {
     review.value = await api.review.get(reviewId)
   }
-  async function updateReview({ changedReview }: { changedReview: Review }) {
+  async function updateReview(changedReview: Review) {
     review.value = await api.review.update(changedReview)
   }
-  async function createReview(newReview: NewReview) {
-    await api.review.create(newReview)
+  async function createReview(newReview: Omit<Review, 'user' | 'id'>) {
+    await api.review.create({
+      ...newReview,
+      id: reviews.value.length + 1,
+      user: {
+        id: 0,
+        username: 'Anonymous',
+        firstName: 'Anonymous',
+        email: 'anon@d.d',
+      },
+    })
+  }
+  async function deleteReview(reviewId: number) {
+    await api.review.remove(reviewId)
   }
 
   return {
@@ -30,5 +42,6 @@ export const useReviewStore = defineStore('review', () => {
     fetchReview,
     updateReview,
     createReview,
+    deleteReview,
   }
 })

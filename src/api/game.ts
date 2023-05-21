@@ -1,5 +1,5 @@
 import { mockGenres, type Genre } from "./genre"
-import type { Review } from "./review"
+import { mockReviews, type Review } from "./review"
 
 
 export type Platform = {
@@ -79,20 +79,6 @@ const mockGames: Game[] = [
   },
 ]
 
-const mockReviews: Review[] = [
-  {
-    id: 1,
-    review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
-    rating: 5,
-    gameId: 1,
-    user: {
-      id: 1,
-      username: 'Nikola Tesla',
-      firstName: 'Nikola',
-      email: 'ghj@g.k',
-    },
-  },
-]
 
 export async function list(): Promise<Game[]> {
   await new Promise(resolve => setTimeout(resolve, 500))

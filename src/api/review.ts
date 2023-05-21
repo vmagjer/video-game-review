@@ -12,7 +12,7 @@ export type Review = {
   user: User
 }
 
-const mockReviews: Review[] = [
+export const mockReviews: Review[] = [
   {
     id: 1,
     review: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
@@ -83,6 +83,12 @@ export async function update(review: Review): Promise<Review> {
   // delay(500)
   await new Promise(resolve => setTimeout(resolve, 500))
   const index = mockReviews.findIndex(mReview => mReview.id === review.id)
+  if (index === -1) {
+    console.log('Review not found', review)
+    console.log('mockReviews', mockReviews)
+
+    throw new Error('Review not found')
+  }
   mockReviews[index] = review
   return review  
 }

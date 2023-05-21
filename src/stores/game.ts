@@ -1,6 +1,8 @@
 import api from '@/api';
-import type { Game, NewGame } from '@/api/game';
+import type { Game, GameDetails, NewGame } from '@/api/game';
 import { defineStore } from 'pinia'
+import { useReviewStore } from './review';
+import type { Review } from '@/api/review';
 
 export const useGameStore = defineStore('game', () => {
   // LIST
@@ -20,15 +22,30 @@ export const useGameStore = defineStore('game', () => {
   }
 
   // SINGLE
-  const game = ref<Game | null>(null)
+  const game = ref<GameDetails | null>(null)
+  const gameReviewScore = computed(() => {
+    if (!game.value) return 0
+    const { reviews } = game.value
+    if (!reviews.length) return 0
+    const total = reviews.reduce((acc, review) => acc + review.rating, 0)
+    return total / reviews.length
+  })
   async function fetchGame(gameId: number) {
     game.value = await api.game.find(gameId)
   }
   async function updateGame({ changedGame }: { changedGame: Game }) {
-    game.value = await api.game.update(changedGame)
+    await api.game.update(changedGame)
   }
-  async function createGame(newGame: NewGame) {
-    return await api.game.create(newGame)
+  const reviewStore = useReviewStore()
+  async function createGame(newGame: NewGame, reviews?: Omit<Review, 'id' | 'gameId' | 'user'>[]) {
+    const game = await api.game.create(newGame)
+    if (reviews) {
+      await Promise.all(reviews.map(review => reviewStore.createReview({
+        ...review,
+        gameId: game.id,
+      })))
+    }
+    return game
   }
 
   return {
@@ -37,6 +54,7 @@ export const useGameStore = defineStore('game', () => {
     fetchByGenre,
     fetchByPlatform,
     game,
+    gameReviewScore,
     fetchGame,
     updateGame,
     createGame,

@@ -2,11 +2,11 @@
 import GameReview from '@/components/GameReview.vue'
 import { useGameStore } from '@/stores/game'
 import { useHead } from '@vueuse/head'
-import { useVuelidate } from '@vuelidate/core'
-import { required, maxLength } from '@vuelidate/validators'
 import ReviewForm from '@/components/ReviewForm.vue'
-import { useReviewStore } from '@/stores/review'
-import { useGenreStore } from '@/stores/genre'
+import type { Review } from '@/api/review'
+import GameForm from '@/components/GameForm.vue'
+import type { Genre } from '@/api/genre'
+import type { Platform } from '@/api/platform'
 
 // useRoute, useHead, and HelloWorld are automatically imported. See vite.config.ts for details.
 const route = useRoute()
@@ -25,94 +25,65 @@ useHead({
   ],
 })
 
-onMounted(fetchGenres)
-
-const genreStore = useGenreStore()
-const loadingGenres = ref(false)
-async function fetchGenres() {
-  loadingGenres.value = true
-  await genreStore.fetchGenres()
-  loadingGenres.value = false
-}
-
 const gameStore = useGameStore()
-const name = ref('')
-const description = ref('')
-const genres = ref<number[]>([])
-
-// validation
-const rules = {
-  name: {
-    required,
-    maxLength: maxLength(100),
-  },
-  description: {
-    required,
-    maxLength: maxLength(1000),
-  },
-  genres: {
-    required,
-  },
-}
-const v$ = useVuelidate(rules, { name, description, genres })
 
 // manipulation
-const reviewStore = useReviewStore()
-async function submit() {
-  console.log('create game', {
-    name: name.value,
-    description: description.value,
-    genres: genres.value,
-    reviewsToAdd: reviewsToAdd.value,
-  })
-
-  const isValid = await v$.value.$validate()
-  if (!isValid) {
-    return
+const loadingCreateGame = ref(false)
+async function submit({
+  name,
+  creatorStudio,
+  description,
+  genres,
+  platforms,
+}: {
+  name: string
+  creatorStudio: string
+  description: string
+  genres: Genre[]
+  platforms: Platform[]
+}) {
+  loadingCreateGame.value = true
+  try {
+    await gameStore.createGame(
+      {
+        name,
+        creatorStudio,
+        description,
+        genres,
+        platforms,
+      },
+      reviewsToAdd.value.map((rev) => rev.review)
+    )    
+  } catch (error) {
+    console.error(error)    
+  } finally {
+    loadingCreateGame.value = false
   }
-
-  const game = await gameStore.createGame({
-    name: name.value,
-    description: description.value,
-    genres: genreStore.genres.filter((genre) =>
-      genres.value.includes(genre.id)
-    ),
-  })
-  console.log('game created', game)
-
-  await Promise.all(
-    reviewsToAdd.value.map((review) =>
-      reviewStore.createReview({
-        rating: review.rating,
-        title: review.title,
-        body: review.body,
-        gameId: game.id,
-        userId: 1,
-        userName: 'John Doe',
-      })
-    )
-  )
-  console.log('reviews created')
 }
 
 type ReviewToAdd = {
   tempId: number
-  rating: number
-  title: string
-  body: string
+  review: Omit<Review, 'id' | 'gameId' | 'user'>
 }
 const reviewsToAdd = ref<ReviewToAdd[]>([])
 
-function addReview({ rating, title, body }: ReviewToAdd) {
+type ReviewForm = {
+  rating: number
+  body: string
+}
+
+function addReview({ rating, body }: ReviewForm) {
   reviewsToAdd.value.push({
     tempId: Date.now(),
-    rating: rating,
-    title: title,
-    body: body,
+    review: {
+      rating,
+      review: body,
+    },
   })
 }
 
 function removeReview(review: ReviewToAdd) {
+  console.log('remove review', review)
   const index = reviewsToAdd.value.findIndex(
     (rev) => rev.tempId === review.tempId
   )
@@ -121,7 +92,10 @@ function removeReview(review: ReviewToAdd) {
   }
   reviewsToAdd.value.splice(index, 1)
 }
+
 function editReview(review: ReviewToAdd) {
+  console.log('edit review', review)
+
   const revToUpdate = reviewsToAdd.value.find(
     (rev) => rev.tempId === review.tempId
   )
@@ -129,9 +103,8 @@ function editReview(review: ReviewToAdd) {
     return
   }
   // update the review
-  revToUpdate.rating = review.rating
-  revToUpdate.title = review.title
-  revToUpdate.body = review.body
+  revToUpdate.review.rating = review.review.rating
+  revToUpdate.review.review = review.review.review
 }
 </script>
 
@@ -139,9 +112,14 @@ function editReview(review: ReviewToAdd) {
   <div class="grid grid-cols-12 gap-6">
     <div class="col-span-4"></div>
     <div class="col-span-5 space-y-4">
-      <form
+      <div
         class="container relative bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 py-6 px-4"
-        @submit.prevent="submit"
+      >
+        <GameForm @submit="submit" />
+      </div>
+      <!-- <form
+        class="container relative bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 py-6 px-4"
+        @submit.prevent
       >
         <h2>
           <span class="prose">Game Info</span>
@@ -206,13 +184,14 @@ function editReview(review: ReviewToAdd) {
         </div>
         <div class="flex justify-end">
           <button
-            type="submit"
+            type="button"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+            @click="submit"
           >
             Create game
           </button>
         </div>
-      </form>
+      </form> -->
       <!-- ################## Reviews ################## -->
       <div
         id="reviews"
@@ -226,22 +205,28 @@ function editReview(review: ReviewToAdd) {
             <p class="text-sm text-neutral-500">No reviews yet.</p>
           </div>
           <GameReview
-            v-for="review in reviewsToAdd"
-            :key="`rev-${review.title}`"
-            :rating="review.rating"
-            :title="review.title"
-            :body="review.body"
+            v-for="item in reviewsToAdd"
+            :id="item.tempId"
+            :key="`rev-${item.tempId}`"
+            :rating="item.review.rating"
+            :body="item.review.review"
             user-name="You"
             :created-at="new Date().toISOString()"
             :updated-at="new Date().toISOString()"
             @edit-review="
               (changedRev) =>
-                editReview({ ...changedRev, tempId: review.tempId })
+                editReview({
+                  tempId: item.tempId,
+                  review: {
+                    rating: changedRev.rating,
+                    review: changedRev.body,
+                  },
+                })
             "
-            @delete-review="removeReview(review)"
+            @delete-review="removeReview(item)"
           />
         </div>
-        <ReviewForm ref="reviewForm" @create-review="addReview" />
+        <ReviewForm @create-review="addReview" />
       </div>
     </div>
   </div>

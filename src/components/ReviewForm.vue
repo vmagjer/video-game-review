@@ -3,10 +3,16 @@ import type { NewReview } from '@/api/review'
 import { useVuelidate } from '@vuelidate/core'
 import { required, between, maxLength } from '@vuelidate/validators'
 
-const emit = defineEmits(['createReview'])
+const emit = defineEmits<{
+  (e:'createReview', review: {
+    rating: number
+    // title: string
+    body: string
+  }): void
+}>()
 
 const rating = ref('')
-const title = ref('')
+// const title = ref('')
 const body = ref('')
 
 const rules = computed(() => {
@@ -15,9 +21,9 @@ const rules = computed(() => {
       required,
       between: between(1, 10),
     },
-    title: {
-      required,
-    },
+    // title: {
+    //   required,
+    // },
     body: {
       required,
       maxLength: maxLength(500),
@@ -25,24 +31,27 @@ const rules = computed(() => {
   }
 })
 
-const v$ = useVuelidate(rules, { rating, title, body })
+const v$ = useVuelidate(rules, { rating,  body })
 
-function submit() {
-  const isValid = v$.value.$validate()
+async function submit() {
+  console.log('submit', { rating: rating.value, body: body.value })
+  const isValid = await v$.value.$validate()
+  console.log('is valid', isValid);
+  
   if (!isValid) {
     return
   }
   emit('createReview', {
     rating: parseInt(rating.value),
-    title: title.value,
+    // title: title.value,
     body: body.value,
   })
 }
 
 function setValues(review: NewReview) {
   rating.value = review.rating.toString()
-  title.value = review.title
-  body.value = review.body
+  // title.value = review.title
+  body.value = review.review
 }
 
 defineExpose({
@@ -54,7 +63,7 @@ defineExpose({
   <form
     id="add-review"
     class="px-4 py-6 space-y-2 bg-slate-100"
-    @submit.prevent="submit"
+    @submit.prevent
   >
     <div class="flex flex-col space-y-2">
       <label class="text-sm text-neutral-500" for="rating"> Rating </label>
@@ -82,7 +91,7 @@ defineExpose({
         </div>
       </div>
     </div>
-    <div class="flex flex-col space-y-2">
+    <!-- <div class="flex flex-col space-y-2">
       <label class="text-sm text-neutral-500" for="title"> Title </label>
       <input
         id="title"
@@ -97,7 +106,7 @@ defineExpose({
           {{ error.$message }}
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="flex flex-col space-y-2">
       <label class="text-sm text-neutral-500" for="body">Body</label>
       <textarea
@@ -117,8 +126,9 @@ defineExpose({
     </div>
     <div class="flex justify-end">
       <button
-        type="submit"
+        type="button"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
+        @click="submit"
       >
         Submit review
       </button>
