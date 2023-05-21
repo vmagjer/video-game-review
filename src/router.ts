@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import IndexPage from '@/pages/IndexPage.vue'
 import GameDetailPage from '@/pages/GameDetailsPage.vue'
-import GaneSearchPage from '@/pages/GameSearchPage.vue'
+import GameSearchPage from '@/pages/GameSearchPage.vue'
 import CreateGamePage from '@/pages/CreateGamePage.vue'
+import EditGamePage from '@/pages/EditGamePage.vue'
 
 const routes = [
   {
@@ -15,7 +16,7 @@ const routes = [
     children: [
       {
         path: '',
-        component: GaneSearchPage,
+        component: GameSearchPage,
         meta: {
           title: 'Game Search | VGR',
         },
@@ -25,6 +26,13 @@ const routes = [
         component: GameDetailPage,
         meta: {
           title: 'Game Detail | VGR',
+        },
+      },
+      {
+        path: '/games/edit/:gameId',
+        component: EditGamePage,
+        meta: {
+          title: 'Edit Game | VGR',
         },
       },
       {

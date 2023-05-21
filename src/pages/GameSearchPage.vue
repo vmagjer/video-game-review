@@ -117,6 +117,7 @@ const gameStore = useGameStore()
                 <th class="px-4 py-2 text-start">Name</th>
                 <th class="px-4 py-2 text-start">Genre</th>
                 <th class="px-4 py-2 text-start">Platform</th>
+                <th class="px-4 py-2 text-start">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -149,6 +150,20 @@ const gameStore = useGameStore()
                       {{ platform.name }}
                     </div>
                   </div>
+                </td>
+                <td class="px-4 py-2 align-top">
+                  <router-link
+                    :to="`/games/edit/${game.id}`"
+                    class="text-sm text-blue-500"
+                  >
+                    Edit
+                  </router-link>
+                  <button
+                    class="text-sm text-red-500"
+                    @click="gameStore.deleteGame(game.id)"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             </tbody>

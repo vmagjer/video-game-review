@@ -33,7 +33,7 @@ export const useGameStore = defineStore('game', () => {
   async function fetchGame(gameId: number) {
     game.value = await api.game.find(gameId)
   }
-  async function updateGame({ changedGame }: { changedGame: Game }) {
+  async function updateGame( changedGame: Game ) {
     await api.game.update(changedGame)
   }
   const reviewStore = useReviewStore()
@@ -47,6 +47,9 @@ export const useGameStore = defineStore('game', () => {
     }
     return game
   }
+  async function deleteGame(gameId: number) {
+    await api.game.remove(gameId)
+  }
 
   return {
     games,
@@ -58,5 +61,6 @@ export const useGameStore = defineStore('game', () => {
     fetchGame,
     updateGame,
     createGame,
+    deleteGame,
   }
 })

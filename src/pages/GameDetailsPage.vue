@@ -4,7 +4,7 @@ import { useGameStore } from '@/stores/game'
 import { useReviewStore } from '@/stores/review'
 import { useHead } from '@vueuse/head'
 import ReviewForm from '@/components/ReviewForm.vue'
-import type { NewReview } from '@/api/review'
+import type { NewReview, Review } from '@/api/review'
 
 // useRoute, useHead, and HelloWorld are automatically imported. See vite.config.ts for details.
 const route = useRoute()
@@ -61,17 +61,10 @@ function scrollToAddReview() {
   }
 }
 
-async function addReview(newReview: Omit<NewReview, 'id' | 'gameId' | 'user'>) {
+async function addReview(newReview: Omit<Review, 'id' | 'gameId' | 'user'>) {
   await reviewStore.createReview({
     ...newReview,
-    id: 0,
     gameId: gameId.value,
-    user: {
-      id: 0,
-      username: 'Anonymous',
-      firstName: 'Anonymous',
-      email: 'anon@email.com',
-    },
   })
 }
 
@@ -176,7 +169,15 @@ async function updateReview(
             @delete-review="() => deleteReview(review.id)"
           />
         </div>
-        <ReviewForm @create-review="addReview" />
+        <ReviewForm
+          @create-review="
+            (newReview) =>
+              addReview({
+                rating: newReview.rating,
+                review: newReview.body,
+              })
+          "
+        />
       </div>
     </div>
   </div>

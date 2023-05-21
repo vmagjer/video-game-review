@@ -74,6 +74,7 @@ const emit = defineEmits<{
       name: string
       creatorStudio: string
       description: string
+      publishedDate: string
       genres: Genre[]
       platforms: Platform[]
     }
@@ -96,6 +97,7 @@ async function submit() {
     name: name.value,
     creatorStudio: creatorStudio.value,
     description: description.value,
+    publishedDate: new Date().toISOString(),
     genres: genres.value.map(
       (id) => genreStore.genres.find((genre) => genre.id === id)!
     ),
@@ -104,6 +106,42 @@ async function submit() {
     ),
   })
 }
+
+function setValues({
+  name: newName,
+  creatorStudio: newCreatorStudio,
+  publishedDate: newPublishedDate,
+  description: newDescription,
+  genres: newGenres,
+  platforms: newPlatforms,
+}: {
+  name: string
+  creatorStudio: string
+  description: string
+  publishedDate: string
+  genres: Genre[]
+  platforms: Platform[]
+}) {
+  console.log('setValues', {
+    name: newName,
+    creatorStudio: newCreatorStudio,
+    description: newDescription,
+    publishedDate: newPublishedDate,
+    genres: newGenres,
+    platforms: newPlatforms,
+  });
+  
+  name.value = newName
+  creatorStudio.value = newCreatorStudio
+  description.value = newDescription  
+  genres.value = newGenres.map((genre) => genre.id)
+  platforms.value = newPlatforms.map((plat) => plat.id)
+}
+
+defineExpose({
+  submit,
+  setValues,
+})
 </script>
 
 <template>
@@ -197,7 +235,7 @@ async function submit() {
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
         @click="submit"
       >
-        Create game
+        Save
       </button>
     </div>
   </form>
