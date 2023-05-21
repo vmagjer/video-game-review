@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core'
-import { required, maxLength } from '@vuelidate/validators'
+import { required, maxLength, helpers } from '@vuelidate/validators'
 import { useGenreStore } from '@/stores/genre'
 import { usePlatformStore } from '@/stores/platform'
 import type { Genre } from '@/api/genre'
 import type { Platform } from '@/api/platform'
 
-onMounted( async () => {
+onMounted(async () => {
   Promise.all([fetchGenres(), fetchPlatforms()])
 })
 
@@ -45,6 +45,12 @@ const rules = {
   description: {
     required,
     maxLength: maxLength(1000),
+    includesName: helpers.withMessage(
+      'Description should mention the full game name at least once.',
+      (value: string) => {
+        return value.toLowerCase().includes(name.value.toLowerCase())
+      }
+    ),
   },
   genres: {
     required,
@@ -53,7 +59,13 @@ const rules = {
     required,
   },
 }
-const v$ = useVuelidate(rules, { name, creatorStudio, description, genres, platforms })
+const v$ = useVuelidate(rules, {
+  name,
+  creatorStudio,
+  description,
+  genres,
+  platforms,
+})
 
 const emit = defineEmits<{
   (
@@ -84,17 +96,18 @@ async function submit() {
     name: name.value,
     creatorStudio: creatorStudio.value,
     description: description.value,
-    genres: genres.value.map((id) => genreStore.genres.find((genre) => genre.id === id)!),
-    platforms: platforms.value.map((id) => platformStore.platforms.find((plat) => plat.id === id)!),
+    genres: genres.value.map(
+      (id) => genreStore.genres.find((genre) => genre.id === id)!
+    ),
+    platforms: platforms.value.map(
+      (id) => platformStore.platforms.find((plat) => plat.id === id)!
+    ),
   })
 }
 </script>
 
 <template>
   <form class="" @submit.prevent>
-    <h2>
-      <span class="prose">Game Info</span>
-    </h2>
     <div class="flex flex-col space-y-2">
       <label class="text-sm text-neutral-500" for="title"> Title </label>
       <input

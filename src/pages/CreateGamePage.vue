@@ -115,98 +115,27 @@ function editReview(review: ReviewToAdd) {
       <div
         class="container relative bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 py-6 px-4"
       >
-        <GameForm @submit="submit" />
-      </div>
-      <!-- <form
-        class="container relative bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 py-6 px-4"
-        @submit.prevent
-      >
         <h2>
           <span class="prose">Game Info</span>
         </h2>
-        <div class="flex flex-col space-y-2">
-          <label class="text-sm text-neutral-500" for="title"> Title </label>
-          <input
-            id="title"
-            v-model="v$.name.$model"
-            class="w-full"
-            type="text"
-            name="title"
-            placeholder="Review title"
-          />
-          <div class="text-red-700 prose-sm">
-            <div v-for="error in v$.name.$errors" :key="error.$uid">
-              {{ error.$message }}
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col space-y-2">
-          <label class="text-sm text-neutral-500" for="genre"> Genre </label>
-          <div v-if="loadingGenres">Loading...</div>
-          <select
-            v-else
-            id="genre"
-            v-model="v$.genres.$model"
-            multiple
-            class="w-full"
-            name="genre"
-          >
-            <option
-              v-for="genre in genreStore.genres"
-              :key="`genre-${genre.id}`"
-              :value="genre.id"
-            >
-              {{ genre.name }}
-            </option>
-          </select>
-          <div class="text-red-700 prose-sm">
-            <div v-for="error in v$.genres.$errors" :key="error.$uid">
-              {{ error.$message }}
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col space-y-2">
-          <label class="text-sm text-neutral-500" for="body">Description</label>
-          <textarea
-            id="body"
-            v-model="description"
-            class="w-full"
-            name="body"
-            cols="30"
-            rows="10"
-            placeholder="Write your review here"
-          ></textarea>
-          <div class="text-red-700 prose-sm">
-            <div v-for="error in v$.description.$errors" :key="error.$uid">
-              {{ error.$message }}
-            </div>
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <button
-            type="button"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600"
-            @click="submit"
-          >
-            Create game
-          </button>
-        </div>
-      </form> -->
+        <GameForm @submit="submit" />
+      </div>
       <!-- ################## Reviews ################## -->
       <div
         id="reviews"
-        class="container relative mx-auto bg-white shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
+        class="container relative mx-auto bg-slate-300 shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5"
       >
         <div class="px-4 pt-2 pb-2 flex justify-between">
-          <h2 class="text-sm text-neutral-500">Reviews</h2>
+          <h2>
+            <span class="prose">Reviews</span>
+          </h2>
         </div>
-        <div class="w-full space-y-4">
+        <div class="w-full space-y-4 mb-4">
           <div v-if="reviewsToAdd.length === 0" class="px-4 py-2">
             <p class="text-sm text-neutral-500">No reviews yet.</p>
           </div>
           <GameReview
             v-for="item in reviewsToAdd"
-            :id="item.tempId"
             :key="`rev-${item.tempId}`"
             :rating="item.review.rating"
             :body="item.review.review"

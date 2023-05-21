@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  id: number
+  id?: number
   rating: number
   body: string
   userName: string
@@ -71,7 +71,7 @@ function cancelEdit() {
       {{ body }}
     </div>
     <div class="flex justify-between">
-      <div class="prose-sm text-neutral-400">{{ `id: ${id}` }}</div>
+      <div v-if="!!props.id" class="prose-sm text-neutral-400">{{ `id: ${id}` }}</div>
       <div class="prose-sm text-neutral-500 text-right">
         <!-- Last edited
         <span class="text-neutral-700">
@@ -118,10 +118,16 @@ function cancelEdit() {
       </div>
     </div>
     <div class="prose">
-      <textarea v-model="_body" class="w-full" placeholder="Body"></textarea>
+      <textarea
+        v-model="_body"
+        class="w-full"
+        placeholder="Body"
+        cols="30"
+        rows="10"
+      ></textarea>
     </div>
     <div class="flex justify-between">
-      <div class="prose-sm text-neutral-400">{{ `id: ${id}` }}</div>
+      <div v-if="!!props.id" class="prose-sm text-neutral-400">{{ `id: ${id}` }}</div>
       <div class="prose-sm text-neutral-500 text-right">
         <!-- Last edited
         <span class="text-neutral-700">{{
