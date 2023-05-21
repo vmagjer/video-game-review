@@ -6,8 +6,8 @@ export const useReviewStore = defineStore('review', () => {
   // LIST
   const reviews = ref<Review[]>([])
 
-  async function fetchReviews({ gameId }: { gameId: number }) {
-    const response = await api.review.list(gameId)
+  async function fetchReviews() {
+    const response = await api.review.list()
     reviews.value = response
   }
 

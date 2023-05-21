@@ -1,11 +1,9 @@
-import { mockGenres, type Genre } from "./genre"
-import { mockReviews, type Review } from "./review"
+import { API_URL } from "@/config"
+import axios from 'axios'
+import type { Genre } from "./genre"
+import type { Review } from "./review"
+import type { Platform } from "./platform"
 
-
-export type Platform = {
-  id: number
-  name: string
-}
 export type Game = {
   id: number
   name: string
@@ -21,150 +19,38 @@ export type GameDetails = Game & {
 }
 
 
-
-const mockGames: Game[] = [
-  {
-    id: 1,
-    name: 'Lorem ipsum dolor sit amet',
-    publishedDate: '2021-01-01T00:00:00.000Z',
-    creatorStudio: 'Studio 1',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
-    platforms: [
-      {
-        id: 1,
-        name: 'Platform 1',
-      },
-      {
-        id: 2,
-        name: 'Platform 2',
-      },
-    ],
-    genres: [
-      {
-        id: 1,
-        name: 'Genre 1',
-      },
-      {
-        id: 2,
-        name: 'Genre 2',
-      },
-      {
-        id: 3,
-        name: 'Genre 3',
-      }
-    ],
-  },
-  {
-    id: 2,
-    name: 'Lorem ipsum dolor sit amet 2',
-    publishedDate: '2021-01-01T00:00:00.000Z',
-    creatorStudio: 'Studio 2',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
-    platforms: [
-      {
-        id: 1,
-        name: 'Platform 1',
-      },
-    ],
-    genres: [
-      {
-        id: 1,
-        name: 'Genre 1',
-      },
-      {
-        id: 2,
-        name: 'Genre 2',
-      },
-    ],
-  },
-]
-
-
 export async function list(): Promise<Game[]> {
-  await new Promise(resolve => setTimeout(resolve, 500))
-  return mockGames
+  const response = await axios.get(`${API_URL}/games`)
+  return response.data
 }
 
 export async function listByGenre(genreId: number): Promise<Game[]> {
-  await new Promise(resolve => setTimeout(resolve, 500))
-  return mockGames.filter(game => game.genres.find(genre => genre.id === genreId))
+  const response = await axios.get(`${API_URL}/genre/${genreId}`)
+  return response.data
 }
 
 export async function listByPlatform(platformId: number): Promise<Game[]> {
-  await new Promise(resolve => setTimeout(resolve, 500))
-  return mockGames.filter(game => game.platforms.find(platform => platform.id === platformId))
+  const response = await axios.get(`${API_URL}/platform/${platformId}`)
+  return response.data
 }
 
-export async function find(id: number): Promise<GameDetails> {
-  await new Promise(resolve => setTimeout(resolve, 500))
-  return  {
-    id: id,
-    name: 'Lorem ipsum dolor sit amet',
-    publishedDate: '2021-01-01T00:00:00.000Z',
-    creatorStudio: 'Studio 1',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet enim, vitae aliquam ni',
-    platforms: [
-      {
-        id: 1,
-        name: 'Platform 1',
-      },
-      {
-        id: 2,
-        name: 'Platform 2',
-      },
-    ],
-    genres: [
-      {
-        id: 1,
-        name: 'Genre 1',
-      },
-      {
-        id: 2,
-        name: 'Genre 2',
-      },
-      {
-        id: 3,
-        name: 'Genre 3',
-      }
-    ],
-    reviews: mockReviews,    
-  }
+export async function find(gameId: number): Promise<GameDetails> {
+  const response = await axios.get(`${API_URL}/games/${gameId}`)
+  return response.data
 }
 
 export type NewGame = Omit<Game, 'id' | 'publishedDate'>
 export async function create(game: NewGame): Promise<Game> {
-  // delay(500)
-  await new Promise(resolve => setTimeout(resolve, 500))
-  if (game.genres.length) {
-    game.genres.forEach(genre => {
-      if (!mockGenres.find(mGame => mGame.id === genre.id)) {
-        mockGenres.push(genre)
-      }
-    })
-  }
-
-  mockGames.push({
-    ...game,
-    id: mockGames.length + 1,
-    publishedDate: new Date().toISOString(),
-  })
-
-  return mockGames[mockGames.length - 1]
+  const response = await axios.post(`${API_URL}/games`, game)
+  return response.data
 }
 
 export async function update(game: Game): Promise<Game> {
-  // delay(500)
-  await new Promise(resolve => setTimeout(resolve, 500))
-  console.log('updateGame', game);
-  const index = mockGames.findIndex(mGame => mGame.id === game.id)
-  mockGames[index] = game
-  return mockGames[index]
+  const response = await axios.put(`${API_URL}/games`, game)
+  return response.data
 }
 
 export async function remove(gameId: number): Promise<void> {
-  // delay(500)
-  await new Promise(resolve => setTimeout(resolve, 500))
-  const index = mockGames.findIndex(game => game.id === gameId)
-  mockGames.splice(index, 1)
+  await axios.delete(`${API_URL}/games/${gameId}`)
 }
 
