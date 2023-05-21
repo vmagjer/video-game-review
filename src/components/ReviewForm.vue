@@ -34,10 +34,7 @@ const rules = computed(() => {
 const v$ = useVuelidate(rules, { rating,  body })
 
 async function submit() {
-  console.log('submit', { rating: rating.value, body: body.value })
-  const isValid = await v$.value.$validate()
-  console.log('is valid', isValid);
-  
+  const isValid = await v$.value.$validate()  
   if (!isValid) {
     return
   }

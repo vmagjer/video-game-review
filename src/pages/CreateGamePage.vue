@@ -83,7 +83,6 @@ function addReview({ rating, body }: ReviewForm) {
 }
 
 function removeReview(review: ReviewToAdd) {
-  console.log('remove review', review)
   const index = reviewsToAdd.value.findIndex(
     (rev) => rev.tempId === review.tempId
   )
@@ -94,8 +93,6 @@ function removeReview(review: ReviewToAdd) {
 }
 
 function editReview(review: ReviewToAdd) {
-  console.log('edit review', review)
-
   const revToUpdate = reviewsToAdd.value.find(
     (rev) => rev.tempId === review.tempId
   )

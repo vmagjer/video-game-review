@@ -82,13 +82,6 @@ const emit = defineEmits<{
 }>()
 // manipulation
 async function submit() {
-  console.log('create game', {
-    name: name.value,
-    creatorStudio: creatorStudio.value,
-    description: description.value,
-    genres: genres.value,
-  })
-
   const isValid = await v$.value.$validate()
   if (!isValid) {
     return
