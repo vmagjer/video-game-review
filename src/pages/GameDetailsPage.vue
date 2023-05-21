@@ -25,7 +25,7 @@ useHead({
 })
 
 onMounted(async () => {
-  await Promise.all([loadGame(), loadReviews()])
+  await Promise.all([loadGame()])
 })
 
 const gameStore = useGameStore()
@@ -37,12 +37,6 @@ async function loadGame() {
 }
 
 const reviewStore = useReviewStore()
-const loadingReviews = ref(false)
-async function loadReviews() {
-  loadingReviews.value = true
-  await reviewStore.fetchReviews({ gameId: gameId.value })
-  loadingReviews.value = false
-}
 
 function scrollToReviews() {
   const reviews = document.getElementById('reviews')
@@ -153,7 +147,7 @@ async function updateReview(
         </div>
         <div class="w-full space-y-4">
           <GameReview
-            v-for="review in reviewStore.reviews"
+            v-for="review in gameStore.game?.reviews"
             :id="review.id"
             :key="`rev-${review.id}`"
             :rating="review.rating"

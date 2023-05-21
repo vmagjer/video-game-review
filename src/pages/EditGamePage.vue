@@ -28,7 +28,7 @@ useHead({
 })
 
 onMounted(async () => {
-  await Promise.all([loadGame(), loadReviews()])
+  await Promise.all([loadGame()])
 })
 
 const gameStore = useGameStore()
@@ -47,18 +47,6 @@ async function loadGame() {
 }
 
 const reviewStore = useReviewStore()
-
-const loadingReviews = ref(false)
-async function loadReviews() {
-  loadingReviews.value = true
-  try {
-    await reviewStore.fetchReviews({ gameId: gameId.value })
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loadingReviews.value = false
-  }
-}
 
 // manipulation
 const loadingEditGame = ref(false)
@@ -134,11 +122,11 @@ async function updateReview(changedReview: Review) {
           </h2>
         </div>
         <div class="w-full space-y-4 mb-4">
-          <div v-if="reviewStore.reviews.length === 0" class="px-4 py-2">
+          <div v-if="gameStore.game?.reviews.length === 0" class="px-4 py-2">
             <p class="text-sm text-neutral-500">No reviews yet.</p>
           </div>
           <GameReview
-            v-for="item in reviewStore.reviews"
+            v-for="item in gameStore.game?.reviews"
             :key="`rev-${item.id}`"
             :rating="item.rating"
             :body="item.review"
