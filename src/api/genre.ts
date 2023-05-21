@@ -7,6 +7,7 @@ export type Genre = {
 }
 
 export async function list(): Promise<Genre[]> {
+  console.log('genre list');
   const response = await axios.get(`${API_URL}/genre`)
   return response.data
 }
