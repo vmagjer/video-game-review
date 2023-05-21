@@ -1,0 +1,1 @@
+export const API_URL = 'https://video-game-review.onrender.com/api'
